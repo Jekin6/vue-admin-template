@@ -10,6 +10,10 @@
       class="filter-tree"
       default-expand-all
     />
+    <div>Array = ['elment1', 'elment2', 'vue']</div>
+    <el-button type="primary" @click="btnNotFoundMethod">Not Found Method</el-button>
+    <el-button type="danger" @click="btnMethodNameTypo">Typo In Method Name</el-button>
+    <el-button plain title="Array has no any()" @click="btnSyntxError">Syntx Error</el-button>
 
   </div>
 </template>
@@ -71,6 +75,35 @@ export default {
     filterNode(value, data) {
       if (!value) return true
       return data.label.indexOf(value) !== -1
+    },
+    myMethod(arr = []) {
+      if (arr.some(d => d === 'vue')) {
+        console.log('This array at least has one element named "vue"')
+        this.$message('This array at least has one element named "vue"')
+      }
+    },
+
+    btnMethodNameTypo() {
+      this.myMethodd(['elment1', 'elment2', 'vue'])
+    },
+    btnNotFoundMethod() {
+      this.processArrayData()
+    },
+    btnSyntxError() {
+      const arr = ['elment1', 'elment2', 'vue']
+      arr.forEach((ele, idx) => {
+        console.log(ele)
+      })
+      if (arr.any(d => d === 'vue')) {
+        console.log('Array does not have any() method!')
+        this.$message('This array at least has one element named "vue"')
+        // this.$notify({
+        //   type: 'info',
+        //   message: `ele-${idx}: ${ele}`,
+        //   duration: 3000
+        // })
+      }
+      this.$message('this message is not displayed due to syntx error in the last line')
     }
   }
 }

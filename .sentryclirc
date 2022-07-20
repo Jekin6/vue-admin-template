@@ -1,0 +1,8 @@
+[defaults]
+project=vue-admin-hackthon
+org=spmi
+url=https://sentry.io/
+[url=http://localhost:9000]
+
+[auth]
+token=c03fad994d1940ba89681c1ecdc5a7823984e23e4f4b4809a5b031c4775dd306

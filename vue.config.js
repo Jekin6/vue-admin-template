@@ -15,6 +15,8 @@ const name = defaultSettings.title || 'vue Admin Template' // page title
 // port = 9528 npm run dev OR npm run dev --port = 9528
 const port = process.env.port || process.env.npm_config_port || 9528 // dev port
 
+const SentryPlugin = require('@sentry/webpack-plugin')
+
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   /**
@@ -28,7 +30,7 @@ module.exports = {
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
-  productionSourceMap: false,
+  productionSourceMap: true, // sourcemap files are not recomended to deploy to production
   devServer: {
     port: port,
     open: true,
@@ -38,13 +40,34 @@ module.exports = {
     },
     before: require('./mock/mock-server.js')
   },
-  configureWebpack: {
-    // provide the app's title in webpack's name field, so that
-    // it can be accessed in index.html to inject the correct title.
-    name: name,
-    resolve: {
-      alias: {
-        '@': resolve('src')
+  // configureWebpack: {
+  //   // provide the app's title in webpack's name field, so that
+  //   // it can be accessed in index.html to inject the correct title.
+  //   name: name,
+  //   resolve: {
+  //     alias: {
+  //       '@': resolve('src')
+  //     }
+  //   }
+  // },
+  configureWebpack: config => {
+    if (process.env.NODE_ENV !== 'development') {
+      config.plugins.push(
+        new SentryPlugin({
+          include: './dist',
+          release: process.env.RELEASE,
+          configFile: 'sentry.properties',
+          // urlPrefix: '~/', // default to '~/'
+          ignore: ['node_modules', 'webpack.config.js', 'vue.config.js']
+        })
+      )
+    }
+    return {
+      name: name,
+      resolve: {
+        alias: {
+          '@': resolve('src')
+        }
       }
     }
   },
@@ -117,6 +140,16 @@ module.exports = {
             })
           // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
           config.optimization.runtimeChunk('single')
+
+          // config.plugins.push(
+          //   new SentryPlugin({
+          //     include: './dist',
+          //     release: process.env.RELEASE,
+          //     configFile: 'sentry.properties',
+          //     urlPrefix: '~/js',
+          //     ignore: ['node_modules', 'webpack.config.js', 'vue.config.js']
+          //   })
+          // )
         }
       )
   }

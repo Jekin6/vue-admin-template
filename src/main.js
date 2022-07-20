@@ -14,7 +14,29 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import * as Sentry from '@sentry/vue'
+import { BrowserTracing } from '@sentry/tracing'
 
+Sentry.init({
+  Vue,
+  release: process.env.RELEASE,
+  environment: process.env.NODE_ENV,
+  debug: true,
+  dsn: 'https://d81a7808406f46c9b3fb7d9c2ce0daf6@o1295963.ingest.sentry.io/6586429',
+  integrations: [
+    new BrowserTracing({
+      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+      tracingOrigins: ['localhost', 'my-site-url.com', /^\//]
+    })
+  ],
+  autoSessionTracking: true, // default: true
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+  trackComponents: ['Header', 'Navigation', 'Footer'],
+  hooks: ['create', 'mount']
+})
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
